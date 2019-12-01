@@ -1,0 +1,7 @@
+<resources>
+    <string name="app_name">My shooting companion</string>
+    <string name="btn_start">start</string>
+    <string name="btn_stop">Clear</string>
+    <string name="txt_time">00:00:00</string>
+
+</resources>
