@@ -48,19 +48,19 @@ public class MainActivity extends AppCompatActivity {
     Handler handler = new Handler();
     int delay = 1000; //milliseconds
     final int SAMPLE_RATE = 44100; // The sampling rate
-    boolean mShouldContinue=true;
+    boolean mShouldContinue = true;
     boolean blocking = false;
-int iddd = 0;
-int reeksNr,shotInReeks;
-long frstTime,lstTime,intrTime,starttime;
-String timeDif;
+    int iddd = 0;
+    int reeksNr, shotInReeks;
+    long frstTime, lstTime, intrTime, starttime;
+    String timeDif;
     private static final SimpleDateFormat sdf = new SimpleDateFormat("yyyy.MM.dd.HH.mm.ss");
 
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        Log.println(Log.INFO,"tagg125","testing");
+        Log.println(Log.INFO, "tagg125", "testing");
         setContentView(R.layout.activity_main);
         this.setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
         requestRecordAudioPermission();
@@ -129,7 +129,7 @@ String timeDif;
         super.onOptionsItemSelected(item);
         if (startRunFive) {
             Toast.makeText(this, "Already Running!", Toast.LENGTH_SHORT).show();
-            } else {
+        } else {
 
             Toast.makeText(this, "Starting up!...", Toast.LENGTH_SHORT).show();
 
@@ -140,10 +140,10 @@ String timeDif;
                 public void run() {
                     Toast.makeText(MainActivity.this, "GO!", Toast.LENGTH_SHORT).show();
                     ToneGenerator toneGen1 = new ToneGenerator(AudioManager.STREAM_MUSIC, 100);
-                    toneGen1.startTone(ToneGenerator.TONE_CDMA_ONE_MIN_BEEP,500);
+                    toneGen1.startTone(ToneGenerator.TONE_CDMA_ONE_MIN_BEEP, 500);
 
-                    mShouldContinue=true;
-                    starttime=System.currentTimeMillis();
+                    mShouldContinue = true;
+                    starttime = System.currentTimeMillis();
                     recordAudio();
                 }
             }, 5000);
@@ -194,52 +194,51 @@ String timeDif;
                 while (mShouldContinue) {
                     int numberOfShort = record.read(audioBuffer, 0, audioBuffer.length);
                     shortsRead += numberOfShort;
-                    int accu=0;
+                    int accu = 0;
                     for (int i = 0; i < audioBuffer.length - 1; i++) {
                         accu += Math.abs(audioBuffer[i]);
                     }
 
-                    int amp = accu/(128 * audioBuffer.length);
-                    Log.println(Log.INFO,"tagg125",""+Short.toString((audioBuffer[12]))+" The length is: "+audioBuffer.length+ " reads are: "+Long.toString(shortsRead)+" amplitude is: "+ Integer.toString(amp)+ " accu is: "+accu);
+                    int amp = accu / (128 * audioBuffer.length);
+                    Log.println(Log.INFO, "tagg125", "" + Short.toString((audioBuffer[12])) + " The length is: " + audioBuffer.length + " reads are: " + Long.toString(shortsRead) + " amplitude is: " + Integer.toString(amp) + " accu is: " + accu);
 
 
-                    if (accu > 21756561 && !blocking){
-    iddd += 1;
-                        int colorBGC = Color.rgb(255,255,255);
+                    if (accu > 3756561 && !blocking) {
+                        iddd += 1;
+                        int colorBGC = Color.rgb(255, 255, 255);
 
-                        if (iddd % 5 == 1){
-       frstTime = System.currentTimeMillis();
-    }
+                        if (iddd % 5 == 1) {
+                            frstTime = System.currentTimeMillis();
+                        }
 
-                        if ( iddd % 5 != 1 ){
-                            shotInReeks+=1;
-                            intrTime = System.currentTimeMillis()-intrTime;
-                            timeDif = ""+Long.toString(intrTime)+" ms";
-                        intrTime = System.currentTimeMillis();
+                        if (iddd % 5 != 1) {
+                            shotInReeks += 1;
+                            intrTime = System.currentTimeMillis() - intrTime;
+                            timeDif = "" + Long.toString(intrTime) + " ms";
+                            intrTime = System.currentTimeMillis();
 
-}
-else{
-     reeksNr +=1;
-     shotInReeks = 1;
-     intrTime = System.currentTimeMillis();
-        timeDif = "First round ("+Long.toString(System.currentTimeMillis()-starttime)+" ms)";
-    colorBGC = Color.rgb(235,235,242);
+                        } else {
+                            reeksNr += 1;
+                            shotInReeks = 1;
+                            intrTime = System.currentTimeMillis();
+                            timeDif = "First round (" + Long.toString(System.currentTimeMillis() - starttime) + " ms)";
+                            colorBGC = Color.rgb(235, 235, 242);
 
-}
+                        }
 
 
                         Timestamp timestamp = new Timestamp(System.currentTimeMillis());
                         System.out.println(timestamp);
 
 
-                        if (iddd % 5==0){
+                        if (iddd % 5 == 0) {
                             mShouldContinue = false;
-                            blocking=true;
-                            lstTime = System.currentTimeMillis() -starttime;
+                            blocking = true;
+                            lstTime = System.currentTimeMillis() - starttime;
 
                             data.add(new DataModel(
-                                    "Shot #"+(iddd)+" (R:"+(reeksNr)+" S:"+(shotInReeks)+")",
-                                    ""+timestamp,
+                                    "Shot #" + (iddd) + " (R:" + (reeksNr) + " S:" + (shotInReeks) + ")",
+                                    "" + timestamp + "\n(Total time " + lstTime + " ms.)",
                                     iddd,
                                     R.drawable.target,
                                     colorBGC,
@@ -251,7 +250,7 @@ else{
                                 public void run() {
 
                                     adapter.notifyDataSetChanged();
-                                   // data.clear();
+                                    // data.clear();
                                     recyclerView.post(new Runnable() {
                                         @Override
                                         public void run() {
@@ -259,19 +258,19 @@ else{
                                             recyclerView.smoothScrollToPosition(adapter.getItemCount() - 1);
                                         }
                                     });
-                                    DialogFragment dialog = new MyDialogFragment(lstTime,data);
+                                    DialogFragment dialog = new MyDialogFragment(lstTime, data);
                                     dialog.show(getFragmentManager(), "MyDialogFragmentTag");
                                     startRunFive = false;
-                                    blocking=false;
+                                    blocking = false;
 
                                 }
                             });
 
-                        }
-                        else{
+                        } else {
+                            lstTime = System.currentTimeMillis() - starttime;
                             data.add(new DataModel(
-                                    "Shot #"+(iddd)+" (R:"+(reeksNr)+" S:"+(shotInReeks)+")",
-                                    ""+timestamp,
+                                    "Shot #" + (iddd) + " (R:" + (reeksNr) + " S:" + (shotInReeks) + ")",
+                                    "" + timestamp + "\n(Total time " + lstTime + " ms.)",
                                     iddd,
                                     R.drawable.target,
                                     colorBGC,
@@ -295,8 +294,7 @@ else{
                         });
 
 
-
-}
+                    }
                 }
 
                 record.stop();
@@ -306,10 +304,11 @@ else{
             }
         }).start();
     }
+
     private void requestRecordAudioPermission() {
         //check API version, do nothing if API version < 23!
         int currentapiVersion = android.os.Build.VERSION.SDK_INT;
-        if (currentapiVersion > android.os.Build.VERSION_CODES.LOLLIPOP){
+        if (currentapiVersion > android.os.Build.VERSION_CODES.LOLLIPOP) {
 
             if (ContextCompat.checkSelfPermission(this, Manifest.permission.RECORD_AUDIO) != PackageManager.PERMISSION_GRANTED) {
 
