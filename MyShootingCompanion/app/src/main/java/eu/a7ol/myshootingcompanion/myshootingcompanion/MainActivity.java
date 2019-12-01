@@ -9,8 +9,10 @@ import android.content.pm.ActivityInfo;
 import android.content.pm.PackageManager;
 import android.graphics.Color;
 import android.media.AudioFormat;
+import android.media.AudioManager;
 import android.media.AudioRecord;
 import android.media.MediaRecorder;
+import android.media.ToneGenerator;
 import android.os.Handler;
 import android.os.Process;
 import android.support.v4.app.ActivityCompat;
@@ -129,16 +131,29 @@ String timeDif;
             Toast.makeText(this, "Already Running!", Toast.LENGTH_SHORT).show();
             } else {
 
-            Toast.makeText(this, "Starting up!", Toast.LENGTH_SHORT).show();
-            mShouldContinue=true;
-            starttime=System.currentTimeMillis();
-            recordAudio();
+            Toast.makeText(this, "Starting up!...", Toast.LENGTH_SHORT).show();
+
+
+            final Handler handler = new Handler();
+            handler.postDelayed(new Runnable() {
+                @Override
+                public void run() {
+                    Toast.makeText(MainActivity.this, "GO!", Toast.LENGTH_SHORT).show();
+                    ToneGenerator toneGen1 = new ToneGenerator(AudioManager.STREAM_MUSIC, 100);
+                    toneGen1.startTone(ToneGenerator.TONE_CDMA_ONE_MIN_BEEP,500);
+
+                    mShouldContinue=true;
+                    starttime=System.currentTimeMillis();
+                    recordAudio();
+                }
+            }, 5000);
+            /*
             handler.postDelayed(new Runnable(){
                 public void run(){
-                   // Toast.makeText(MainActivity.this, "testing", Toast.LENGTH_SHORT).show();
+                   //
                     handler.postDelayed(this, delay);
                 }
-            }, delay);
+            }, delay);*/
             startRunFive = true;
         }
         return true;
@@ -188,7 +203,7 @@ String timeDif;
                     Log.println(Log.INFO,"tagg125",""+Short.toString((audioBuffer[12]))+" The length is: "+audioBuffer.length+ " reads are: "+Long.toString(shortsRead)+" amplitude is: "+ Integer.toString(amp)+ " accu is: "+accu);
 
 
-                    if (accu > 4358230 && !blocking){
+                    if (accu > 21756561 && !blocking){
     iddd += 1;
                         int colorBGC = Color.rgb(255,255,255);
 
@@ -220,7 +235,7 @@ else{
                         if (iddd % 5==0){
                             mShouldContinue = false;
                             blocking=true;
-                            lstTime = System.currentTimeMillis() -frstTime;
+                            lstTime = System.currentTimeMillis() -starttime;
 
                             data.add(new DataModel(
                                     "Shot #"+(iddd)+" (R:"+(reeksNr)+" S:"+(shotInReeks)+")",
