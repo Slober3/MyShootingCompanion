@@ -47,8 +47,10 @@ public class MainActivity extends AppCompatActivity {
     int delay = 1000; //milliseconds
     final int SAMPLE_RATE = 44100; // The sampling rate
     boolean mShouldContinue=true;
+    boolean blocking = false;
 int iddd = 0;
-long frstTime,lstTime,intrTime;
+int reeksNr,shotInReeks;
+long frstTime,lstTime,intrTime,starttime;
 String timeDif;
     private static final SimpleDateFormat sdf = new SimpleDateFormat("yyyy.MM.dd.HH.mm.ss");
 
@@ -128,6 +130,8 @@ String timeDif;
             } else {
 
             Toast.makeText(this, "Starting up!", Toast.LENGTH_SHORT).show();
+            mShouldContinue=true;
+            starttime=System.currentTimeMillis();
             recordAudio();
             handler.postDelayed(new Runnable(){
                 public void run(){
@@ -184,70 +188,93 @@ String timeDif;
                     Log.println(Log.INFO,"tagg125",""+Short.toString((audioBuffer[12]))+" The length is: "+audioBuffer.length+ " reads are: "+Long.toString(shortsRead)+" amplitude is: "+ Integer.toString(amp)+ " accu is: "+accu);
 
 
-                    if (accu > 4358230){
+                    if (accu > 4358230 && !blocking){
     iddd += 1;
-    if (iddd % 5 == 1){
+                        int colorBGC = Color.rgb(255,255,255);
+
+                        if (iddd % 5 == 1){
        frstTime = System.currentTimeMillis();
     }
-if ( iddd % 5 != 1 ){
-        intrTime = System.currentTimeMillis()-intrTime;
-        timeDif = ""+Long.toString(intrTime)+" ms";
-    intrTime = System.currentTimeMillis();
+
+                        if ( iddd % 5 != 1 ){
+                            shotInReeks+=1;
+                            intrTime = System.currentTimeMillis()-intrTime;
+                            timeDif = ""+Long.toString(intrTime)+" ms";
+                        intrTime = System.currentTimeMillis();
 
 }
 else{
-        intrTime = System.currentTimeMillis();
-        timeDif = "First round";
+     reeksNr +=1;
+     shotInReeks = 1;
+     intrTime = System.currentTimeMillis();
+        timeDif = "First round ("+Long.toString(System.currentTimeMillis()-starttime)+" ms)";
+    colorBGC = Color.rgb(235,235,242);
+
 }
-    int colorBGC = Color.rgb(255,255,255);
-/*
-    if(accu > 5258230){
-        colorBGC = Color.rgb(147,227,111);
-    }
 
-    if(accu > 6258230){
-        colorBGC = Color.rgb(191,111,227);
-    }
-
-
-    if(accu > 7258230){
-        colorBGC = Color.rgb(249,255,239);
-    }
-
-    if(accu > 8258230){
-        colorBGC = Color.rgb(255,239,249);
-    }
-*/
 
                         Timestamp timestamp = new Timestamp(System.currentTimeMillis());
                         System.out.println(timestamp);
 
-    data.add(new DataModel(
-            "Shot #"+(iddd),
-            ""+timestamp,
-            iddd,
-            R.drawable.target,
-            colorBGC,
-            timeDif
-    ));
+
                         if (iddd % 5==0){
+                            mShouldContinue = false;
+                            blocking=true;
                             lstTime = System.currentTimeMillis() -frstTime;
+
+                            data.add(new DataModel(
+                                    "Shot #"+(iddd)+" (R:"+(reeksNr)+" S:"+(shotInReeks)+")",
+                                    ""+timestamp,
+                                    iddd,
+                                    R.drawable.target,
+                                    colorBGC,
+                                    timeDif
+                            ));
+
                             runOnUiThread(new Runnable() {
                                 @Override
                                 public void run() {
+
                                     adapter.notifyDataSetChanged();
                                    // data.clear();
+                                    recyclerView.post(new Runnable() {
+                                        @Override
+                                        public void run() {
+                                            // Call smooth scroll
+                                            recyclerView.smoothScrollToPosition(adapter.getItemCount() - 1);
+                                        }
+                                    });
                                     DialogFragment dialog = new MyDialogFragment(lstTime,data);
                                     dialog.show(getFragmentManager(), "MyDialogFragmentTag");
+                                    startRunFive = false;
+                                    blocking=false;
+
                                 }
                             });
 
+                        }
+                        else{
+                            data.add(new DataModel(
+                                    "Shot #"+(iddd)+" (R:"+(reeksNr)+" S:"+(shotInReeks)+")",
+                                    ""+timestamp,
+                                    iddd,
+                                    R.drawable.target,
+                                    colorBGC,
+                                    timeDif
+                            ));
                         }
 
                         runOnUiThread(new Runnable() {
                             @Override
                             public void run() {
                                 adapter.notifyDataSetChanged();
+                                recyclerView.post(new Runnable() {
+                                    @Override
+                                    public void run() {
+                                        // Call smooth scroll
+                                        recyclerView.smoothScrollToPosition(adapter.getItemCount() - 1);
+                                    }
+                                });
 
                             }
                         });

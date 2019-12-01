@@ -29,7 +29,7 @@ public class MyDialogFragment extends DialogFragment {
         // Use the Builder class for convenient dialog construction
         AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
         builder.setTitle("Completed!");
-        builder.setMessage("You took "+ Long.toString((lasttime/1000))+" seconds. \nOr "+ Long.toString((lasttime))+" milliseconds.");
+        builder.setMessage("You took "+ Long.toString((lasttime/1000))+" seconds. \nOr "+ Long.toString((lasttime))+" milliseconds.\n\nPress start again to log your next run!");
         builder.setNegativeButton("Delete", new DialogInterface.OnClickListener() {
             public void onClick(DialogInterface dialog, int id) {
                 data.clear();
