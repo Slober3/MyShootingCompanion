@@ -7,4 +7,13 @@
         android:title="START"
         android:orderInCategory="100"
         app:showAsAction="always"/>
+    <item
+        android:id="@+id/item2"
+        android:title="Calculate points"
+        app:showAsAction="never" />
+
+    <item
+        android:id="@+id/item3"
+        android:title="Set sound level"
+        app:showAsAction="never"/>
 </menu>

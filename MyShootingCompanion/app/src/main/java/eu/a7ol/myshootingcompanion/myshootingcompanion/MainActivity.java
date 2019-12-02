@@ -5,8 +5,10 @@ import android.app.AlertDialog;
 import android.app.Dialog;
 import android.app.DialogFragment;
 import android.content.DialogInterface;
+import android.content.SharedPreferences;
 import android.content.pm.ActivityInfo;
 import android.content.pm.PackageManager;
+import android.content.res.Configuration;
 import android.graphics.Color;
 import android.media.AudioFormat;
 import android.media.AudioManager;
@@ -23,10 +25,12 @@ import android.content.Context;
 import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.text.InputType;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -60,7 +64,16 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        SharedPreferences pref = getApplicationContext().getSharedPreferences("MyPref", 0);
+        SharedPreferences.Editor editor = pref.edit();
+
         Log.println(Log.INFO, "tagg125", "testing");
+
+        Log.println(Log.INFO, "tagg125", "testing0 "+pref.getInt("soundlv", 3856561));
+        /*editor.putInt("soundlv", 3856561); // Storing integer
+        editor.commit();*/
+        Log.println(Log.INFO, "tagg125", "testing"+pref.getInt("soundlv", 3856561));
+
         setContentView(R.layout.activity_main);
         this.setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
         requestRecordAudioPermission();
@@ -126,27 +139,30 @@ public class MainActivity extends AppCompatActivity {
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        super.onOptionsItemSelected(item);
-        if (startRunFive) {
-            Toast.makeText(this, "Already Running!", Toast.LENGTH_SHORT).show();
-        } else {
 
-            Toast.makeText(this, "Starting up!...", Toast.LENGTH_SHORT).show();
+        switch (item.getItemId()) {
+            case R.id.add_item:
+
+                if (startRunFive) {
+                    Toast.makeText(this, "Already Running!", Toast.LENGTH_SHORT).show();
+                } else {
+
+                    Toast.makeText(this, "Starting up!...", Toast.LENGTH_SHORT).show();
 
 
-            final Handler handler = new Handler();
-            handler.postDelayed(new Runnable() {
-                @Override
-                public void run() {
-                    Toast.makeText(MainActivity.this, "GO!", Toast.LENGTH_SHORT).show();
-                    ToneGenerator toneGen1 = new ToneGenerator(AudioManager.STREAM_MUSIC, 100);
-                    toneGen1.startTone(ToneGenerator.TONE_CDMA_ONE_MIN_BEEP, 500);
+                    final Handler handler = new Handler();
+                    handler.postDelayed(new Runnable() {
+                        @Override
+                        public void run() {
+                            Toast.makeText(MainActivity.this, "GO!", Toast.LENGTH_SHORT).show();
+                            ToneGenerator toneGen1 = new ToneGenerator(AudioManager.STREAM_MUSIC, 100);
+                            toneGen1.startTone(ToneGenerator.TONE_CDMA_ONE_MIN_BEEP, 500);
 
-                    mShouldContinue = true;
-                    starttime = System.currentTimeMillis();
-                    recordAudio();
-                }
-            }, 5000);
+                            mShouldContinue = true;
+                            starttime = System.currentTimeMillis();
+                            recordAudio();
+                        }
+                    }, 5000);
             /*
             handler.postDelayed(new Runnable(){
                 public void run(){
@@ -154,15 +170,57 @@ public class MainActivity extends AppCompatActivity {
                     handler.postDelayed(this, delay);
                 }
             }, delay);*/
-            startRunFive = true;
+                    startRunFive = true;
+                }
+                return true;
+            case R.id.item2:
+                Toast.makeText(this, "Coming soon! #2", Toast.LENGTH_SHORT).show();
+                return true;
+            case R.id.item3:
+                AlertDialog.Builder builder = new AlertDialog.Builder(this);
+                builder.setTitle("Set sound level");
+                builder.setMessage("Please set the appropriate sound level.\nThis number can be verry high 30 or even 40 million.");
+
+                final EditText input = new EditText(this);
+                input.setInputType(InputType.TYPE_CLASS_NUMBER);
+                input.setRawInputType(Configuration.KEYBOARD_12KEY);
+                builder.setView(input);
+
+                builder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        String m_Text = input.getText().toString();
+                        SharedPreferences pref = getApplicationContext().getSharedPreferences("MyPref", 0);
+                        SharedPreferences.Editor editor = pref.edit();
+
+                        editor.putInt("soundlv", Integer.parseInt(m_Text)); // Storing integer
+                        editor.commit();
+
+
+                    }
+                });
+                builder.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        dialog.cancel();
+                    }
+                });
+
+                builder.show();
+
+                return true;
+            default:
+                return super.onOptionsItemSelected(item);
         }
-        return true;
     }
 
     void recordAudio() {
         new Thread(new Runnable() {
             @Override
             public void run() {
+                SharedPreferences pref = getApplicationContext().getSharedPreferences("MyPref", 0);
+                SharedPreferences.Editor editor = pref.edit();
+
                 Process.setThreadPriority(Process.THREAD_PRIORITY_AUDIO);
 
                 // buffer size in bytes
@@ -203,7 +261,7 @@ public class MainActivity extends AppCompatActivity {
                     Log.println(Log.INFO, "tagg125", "" + Short.toString((audioBuffer[12])) + " The length is: " + audioBuffer.length + " reads are: " + Long.toString(shortsRead) + " amplitude is: " + Integer.toString(amp) + " accu is: " + accu);
 
 
-                    if (accu > 3756561 && !blocking) {
+                    if (accu > pref.getInt("soundlv", 3800000) && !blocking) {
                         iddd += 1;
                         int colorBGC = Color.rgb(255, 255, 255);
 
