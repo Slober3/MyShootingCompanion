@@ -20,9 +20,9 @@ public class DataModel {
         this.Time = Time;
         this.Tot_time = "0";
         this.id_ = id_;
-        this.image=image;
-        this.color= colorBG ;
-        this.timedif= timediff;
+        this.image = image;
+        this.color = colorBG;
+        this.timedif = timediff;
     }
 
     public String getName() {
@@ -36,6 +36,7 @@ public class DataModel {
     public String getTotTime() {
         return Tot_time;
     }
+
     public String getTimedif() {
         return timedif;
     }

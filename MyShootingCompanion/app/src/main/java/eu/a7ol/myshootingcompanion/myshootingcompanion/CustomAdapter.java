@@ -29,7 +29,7 @@ public class CustomAdapter extends RecyclerView.Adapter<CustomAdapter.MyViewHold
             this.textViewVersion = (TextView) itemView.findViewById(R.id.textViewVersion);
             this.imageViewIcon = (ImageView) itemView.findViewById(R.id.imageView);
             this.cardViewColor = (CardView) itemView.findViewById(R.id.card_view);
-        this.textViewtime = (TextView) itemView.findViewById(R.id.textView);
+            this.textViewtime = (TextView) itemView.findViewById(R.id.textView);
 
         }
     }

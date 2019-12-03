@@ -15,8 +15,10 @@ import android.media.AudioManager;
 import android.media.AudioRecord;
 import android.media.MediaRecorder;
 import android.media.ToneGenerator;
+import android.os.Build;
 import android.os.Handler;
 import android.os.Process;
+import android.support.annotation.RequiresApi;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
@@ -25,12 +27,14 @@ import android.content.Context;
 import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.text.InputFilter;
 import android.text.InputType;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.EditText;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -69,10 +73,10 @@ public class MainActivity extends AppCompatActivity {
 
         Log.println(Log.INFO, "tagg125", "testing");
 
-        Log.println(Log.INFO, "tagg125", "testing0 "+pref.getInt("soundlv", 3856561));
+        Log.println(Log.INFO, "tagg125", "testing0 " + pref.getInt("soundlv", 3856561));
         /*editor.putInt("soundlv", 3856561); // Storing integer
         editor.commit();*/
-        Log.println(Log.INFO, "tagg125", "testing"+pref.getInt("soundlv", 3856561));
+        Log.println(Log.INFO, "tagg125", "testing" + pref.getInt("soundlv", 3856561));
 
         setContentView(R.layout.activity_main);
         this.setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
@@ -102,6 +106,26 @@ public class MainActivity extends AppCompatActivity {
 
         adapter = new CustomAdapter(data);
         recyclerView.setAdapter(adapter);
+
+
+        // You don't have to do anything here if you just
+        Context context = MainActivity.this;
+        LinearLayout layout = new LinearLayout(context);
+        layout.setOrientation(LinearLayout.HORIZONTAL);
+
+        AlertDialog.Builder builder2 = new AlertDialog.Builder(MainActivity.this);
+        builder2.setTitle("Information");
+        builder2.setMessage("Please enjoy this app...\nPress start to start your run!");
+
+        builder2.setPositiveButton("OK", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+
+            }
+        });
+
+        builder2.show();
+
     }
 
 
@@ -148,7 +172,7 @@ public class MainActivity extends AppCompatActivity {
                 } else {
 
                     Toast.makeText(this, "Starting up!...", Toast.LENGTH_SHORT).show();
-
+                    SharedPreferences preft55 = getApplicationContext().getSharedPreferences("MyPref", 0);
 
                     final Handler handler = new Handler();
                     handler.postDelayed(new Runnable() {
@@ -162,7 +186,7 @@ public class MainActivity extends AppCompatActivity {
                             starttime = System.currentTimeMillis();
                             recordAudio();
                         }
-                    }, 5000);
+                    }, preft55.getInt("timeforbeep", 5000));
             /*
             handler.postDelayed(new Runnable(){
                 public void run(){
@@ -180,10 +204,12 @@ public class MainActivity extends AppCompatActivity {
                 AlertDialog.Builder builder = new AlertDialog.Builder(this);
                 builder.setTitle("Set sound level");
                 builder.setMessage("Please set the appropriate sound level.\nThis number can be verry high 30 or even 40 million.");
+                SharedPreferences preft3 = getApplicationContext().getSharedPreferences("MyPref", 0);
 
                 final EditText input = new EditText(this);
                 input.setInputType(InputType.TYPE_CLASS_NUMBER);
                 input.setRawInputType(Configuration.KEYBOARD_12KEY);
+                input.setText("" + preft3.getInt("soundlv", 3800000));
                 builder.setView(input);
 
                 builder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
@@ -209,6 +235,89 @@ public class MainActivity extends AppCompatActivity {
                 builder.show();
 
                 return true;
+            case R.id.item4:
+                SharedPreferences preft4 = getApplicationContext().getSharedPreferences("MyPref", 0);
+
+                AlertDialog.Builder builder2 = new AlertDialog.Builder(this);
+                builder2.setTitle("Set shots per run");
+                builder2.setMessage("Please set the appropriate shots per run.");
+
+                final EditText input2 = new EditText(this);
+                input2.setText("" + preft4.getInt("shotperrun", 5));
+                input2.setInputType(InputType.TYPE_CLASS_NUMBER);
+                input2.setRawInputType(Configuration.KEYBOARD_12KEY);
+                builder2.setView(input2);
+
+                builder2.setPositiveButton("OK", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        String m_Text2 = input2.getText().toString();
+                        SharedPreferences pref = getApplicationContext().getSharedPreferences("MyPref", 0);
+                        SharedPreferences.Editor editor = pref.edit();
+
+                        editor.putInt("shotperrun", Integer.parseInt(m_Text2)); // Storing integer
+                        editor.commit();
+
+
+                    }
+                });
+                builder2.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        dialog.cancel();
+                    }
+                });
+
+                builder2.show();
+                return true;
+            case R.id.item5:
+                SharedPreferences pref = getApplicationContext().getSharedPreferences("MyPref", 0);
+
+                if (iddd % pref.getInt("shotperrun", 5) == 0) {
+                    data.clear();
+                    adapter.notifyDataSetChanged();
+                } else {
+                    Toast.makeText(this, "Please finish your current run!", Toast.LENGTH_SHORT).show();
+
+                }
+
+                return true;
+            case R.id.item6:
+                SharedPreferences preft5 = getApplicationContext().getSharedPreferences("MyPref", 0);
+
+                AlertDialog.Builder builder3 = new AlertDialog.Builder(this);
+                builder3.setTitle("Set time before beep");
+                builder3.setMessage("Please set the appropriate time before the beep sound in ms. 1000ms is 1 second.");
+
+                final EditText input3 = new EditText(this);
+                input3.setText("" + preft5.getInt("timeforbeep", 5000));
+                input3.setInputType(InputType.TYPE_CLASS_NUMBER);
+                input3.setRawInputType(Configuration.KEYBOARD_12KEY);
+                builder3.setView(input3);
+
+                builder3.setPositiveButton("OK", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        String m_Text3 = input3.getText().toString();
+                        SharedPreferences pref = getApplicationContext().getSharedPreferences("MyPref", 0);
+                        SharedPreferences.Editor editor = pref.edit();
+
+                        editor.putInt("timeforbeep", Integer.parseInt(m_Text3)); // Storing integer
+                        editor.commit();
+
+
+                    }
+                });
+                builder3.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        dialog.cancel();
+                    }
+                });
+
+                builder3.show();
+                return true;
+
             default:
                 return super.onOptionsItemSelected(item);
         }
@@ -218,7 +327,7 @@ public class MainActivity extends AppCompatActivity {
         new Thread(new Runnable() {
             @Override
             public void run() {
-                SharedPreferences pref = getApplicationContext().getSharedPreferences("MyPref", 0);
+                final SharedPreferences pref = getApplicationContext().getSharedPreferences("MyPref", 0);
                 SharedPreferences.Editor editor = pref.edit();
 
                 Process.setThreadPriority(Process.THREAD_PRIORITY_AUDIO);
@@ -264,32 +373,34 @@ public class MainActivity extends AppCompatActivity {
                     if (accu > pref.getInt("soundlv", 3800000) && !blocking) {
                         iddd += 1;
                         int colorBGC = Color.rgb(255, 255, 255);
+                        int picture = R.drawable.target;
 
-                        if (iddd % 5 == 1) {
+                        if (iddd % pref.getInt("shotperrun", 5) == 1) {
                             frstTime = System.currentTimeMillis();
                         }
 
-                        if (iddd % 5 != 1) {
+                        if (iddd % pref.getInt("shotperrun", 5) != 1) {
                             shotInReeks += 1;
                             intrTime = System.currentTimeMillis() - intrTime;
                             timeDif = "" + Long.toString(intrTime) + " ms";
                             intrTime = System.currentTimeMillis();
-
+                            picture = R.drawable.target;
                         } else {
                             reeksNr += 1;
                             shotInReeks = 1;
                             intrTime = System.currentTimeMillis();
                             timeDif = "First round (" + Long.toString(System.currentTimeMillis() - starttime) + " ms)";
                             colorBGC = Color.rgb(235, 235, 242);
+                            picture = R.drawable.start;
 
                         }
 
 
-                        Timestamp timestamp = new Timestamp(System.currentTimeMillis());
+                        final Timestamp timestamp = new Timestamp(System.currentTimeMillis());
                         System.out.println(timestamp);
 
 
-                        if (iddd % 5 == 0) {
+                        if (iddd % pref.getInt("shotperrun", 5) == 0) {
                             mShouldContinue = false;
                             blocking = true;
                             lstTime = System.currentTimeMillis() - starttime;
@@ -298,7 +409,7 @@ public class MainActivity extends AppCompatActivity {
                                     "Shot #" + (iddd) + " (R:" + (reeksNr) + " S:" + (shotInReeks) + ")",
                                     "" + timestamp + "\n(Total time " + lstTime + " ms.)",
                                     iddd,
-                                    R.drawable.target,
+                                    R.drawable.finish,
                                     colorBGC,
                                     timeDif
                             ));
@@ -316,8 +427,81 @@ public class MainActivity extends AppCompatActivity {
                                             recyclerView.smoothScrollToPosition(adapter.getItemCount() - 1);
                                         }
                                     });
-                                    DialogFragment dialog = new MyDialogFragment(lstTime, data);
-                                    dialog.show(getFragmentManager(), "MyDialogFragmentTag");
+                                   /* DialogFragment dialog = new MyDialogFragment(lstTime, data);
+                                    dialog.show(getFragmentManager(), "MyDialogFragmentTag");*/
+//
+
+                                    // Use the Builder class for convenient dialog construction
+                                    AlertDialog.Builder builder = new AlertDialog.Builder(MainActivity.this);
+                                    builder.setTitle("Completed!");
+                                    builder.setMessage("You took " + Long.toString((lstTime / 1000)) + " seconds. \nOr " + Long.toString((lstTime)) + " milliseconds.\n\nPress start again to log your next run!");
+                                    builder.setNegativeButton("Delete", new DialogInterface.OnClickListener() {
+                                        public void onClick(DialogInterface dialog, int id) {
+                                            data.clear();
+
+
+                                        }
+                                    }).setPositiveButton("OK", new DialogInterface.OnClickListener() {
+                                        public void onClick(DialogInterface dialog, int id) {
+                                            // You don't have to do anything here if you just
+                                            // want it dismissed when clicked
+                                        }
+                                    }).setNeutralButton("Add Points", new DialogInterface.OnClickListener() {
+                                        @RequiresApi(api = Build.VERSION_CODES.M)
+                                        public void onClick(DialogInterface dialog, final int id) {
+                                            // You don't have to do anything here if you just
+                                            Context context = MainActivity.this;
+                                            LinearLayout layout = new LinearLayout(context);
+                                            layout.setOrientation(LinearLayout.HORIZONTAL);
+
+                                            AlertDialog.Builder builder2 = new AlertDialog.Builder(MainActivity.this);
+                                            builder2.setTitle("Enter your points");
+                                            builder2.setMessage("Please enter your points\nYou should do this in one number\nDo not add spaces.");
+
+                                            final EditText input2 = new EditText(MainActivity.this);
+
+                                            input2.setInputType(InputType.TYPE_CLASS_NUMBER);
+                                            input2.setRawInputType(Configuration.KEYBOARD_12KEY);
+                                            input2.setFilters(new InputFilter[]{new InputFilter.LengthFilter(pref.getInt("shotperrun", 5))});
+
+                                            builder2.setView(input2);
+
+                                            builder2.setPositiveButton("OK", new DialogInterface.OnClickListener() {
+                                                @Override
+                                                public void onClick(DialogInterface dialog, int which) {
+                                                    String m_Text2 = input2.getText().toString();
+                                                    int score = 0;//
+                                                    for (int i = 0; i < m_Text2.length(); i++) {
+                                                        score += Integer.parseInt(String.valueOf(m_Text2.charAt(i)));
+                                                    }
+                                                    int colorBGCC = Color.rgb(255, 255, 255);
+
+                                                    data.set(iddd - 1, new DataModel(
+                                                            "Shot #" + (iddd) + " (R:" + (reeksNr) + " S:" + (shotInReeks) + ")",
+                                                            "" + timestamp + "\n(Total time " + lstTime + " ms)\n\n" + "Score: " + score + "\nGem. Score: " + score / m_Text2.length() + "",
+                                                            iddd,
+                                                            R.drawable.finish,
+                                                            colorBGCC,
+                                                            timeDif
+                                                    ));
+                                                    adapter.notifyDataSetChanged();
+                                                }
+                                            });
+                                            builder2.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+                                                @Override
+                                                public void onClick(DialogInterface dialog, int which) {
+                                                    dialog.cancel();
+                                                }
+                                            });
+
+                                            builder2.show();
+                                        }
+                                    });
+
+                                    // Create the AlertDialog object and return it
+                                    builder.create();
+                                    builder.show();
+                                    //
                                     startRunFive = false;
                                     blocking = false;
 
@@ -330,7 +514,7 @@ public class MainActivity extends AppCompatActivity {
                                     "Shot #" + (iddd) + " (R:" + (reeksNr) + " S:" + (shotInReeks) + ")",
                                     "" + timestamp + "\n(Total time " + lstTime + " ms.)",
                                     iddd,
-                                    R.drawable.target,
+                                    picture,
                                     colorBGC,
                                     timeDif
                             ));
