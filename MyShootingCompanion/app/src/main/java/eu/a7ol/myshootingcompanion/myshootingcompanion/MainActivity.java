@@ -5,6 +5,7 @@ import android.app.AlertDialog;
 import android.app.Dialog;
 import android.app.DialogFragment;
 import android.content.DialogInterface;
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.ActivityInfo;
 import android.content.pm.PackageManager;
@@ -38,6 +39,8 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import org.opencv.android.OpenCVLoader;
+
 import java.sql.Time;
 import java.sql.Timestamp;
 import java.text.SimpleDateFormat;
@@ -64,13 +67,12 @@ public class MainActivity extends AppCompatActivity {
     String timeDif;
     private static final SimpleDateFormat sdf = new SimpleDateFormat("yyyy.MM.dd.HH.mm.ss");
 
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         SharedPreferences pref = getApplicationContext().getSharedPreferences("MyPref", 0);
         SharedPreferences.Editor editor = pref.edit();
-
+        System.loadLibrary("opencv_java3");
         Log.println(Log.INFO, "tagg125", "testing");
 
         Log.println(Log.INFO, "tagg125", "testing0 " + pref.getInt("soundlv", 3856561));
@@ -199,6 +201,9 @@ public class MainActivity extends AppCompatActivity {
                 return true;
             case R.id.item2:
                 Toast.makeText(this, "Coming soon! #2", Toast.LENGTH_SHORT).show();
+                Intent intent = new Intent(this, Main2Activity.class);
+                startActivity(intent);
+
                 return true;
             case R.id.item3:
                 AlertDialog.Builder builder = new AlertDialog.Builder(this);
