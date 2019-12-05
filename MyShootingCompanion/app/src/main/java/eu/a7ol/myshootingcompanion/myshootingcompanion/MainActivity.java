@@ -39,8 +39,14 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.google.gson.Gson;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
+import com.google.gson.reflect.TypeToken;
+
 import org.opencv.android.OpenCVLoader;
 
+import java.lang.reflect.Type;
 import java.sql.Time;
 import java.sql.Timestamp;
 import java.text.SimpleDateFormat;
@@ -102,7 +108,7 @@ public class MainActivity extends AppCompatActivity {
         recyclerView.setItemAnimator(new DefaultItemAnimator());
 
         data = new ArrayList<DataModel>();
-
+        //loadData();
 
         removedItems = new ArrayList<Integer>();
 
@@ -131,7 +137,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
 
-    private static class MyOnClickListener implements View.OnClickListener {
+    private class MyOnClickListener implements View.OnClickListener {
 
         private final Context context;
 
@@ -152,6 +158,7 @@ public class MainActivity extends AppCompatActivity {
                     = (TextView) viewHolder.itemView.findViewById(R.id.textViewName);
             String selectedName = (String) textViewName.getText();
             data.remove(selectedItemPosition);
+            //saveData();
             adapter.notifyItemRemoved(selectedItemPosition);
         }
     }
@@ -280,6 +287,7 @@ public class MainActivity extends AppCompatActivity {
 
                 if (iddd % pref.getInt("shotperrun", 5) == 0) {
                     data.clear();
+                    //saveData();
                     adapter.notifyDataSetChanged();
                 } else {
                     Toast.makeText(this, "Please finish your current run!", Toast.LENGTH_SHORT).show();
@@ -323,7 +331,56 @@ public class MainActivity extends AppCompatActivity {
                 builder3.show();
                 return true;
 
-            default:
+            case R.id.item7:
+                AlertDialog.Builder builder4 = new AlertDialog.Builder(this);
+                builder4.setTitle("Saving data");
+                builder4.setMessage("Are you sure? Other data will be overwritten!");
+
+                builder4.setPositiveButton("OK", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+
+                        saveData();
+                        Toast.makeText(MainActivity.this, "Data Saved!", Toast.LENGTH_SHORT).show();
+
+
+                    }
+                });
+                builder4.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        dialog.cancel();
+                    }
+                });
+
+                builder4.show();
+                return true;
+
+            case R.id.item8:
+                AlertDialog.Builder builder5 = new AlertDialog.Builder(this);
+                builder5.setTitle("Loading data");
+                builder5.setMessage("Are you sure? Your current data will be overwritten!");
+
+                builder5.setPositiveButton("OK", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+
+                        //loadData();
+                        Toast.makeText(MainActivity.this, "Data loaded!", Toast.LENGTH_SHORT).show();
+
+                    }
+                });
+                builder5.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        dialog.cancel();
+                    }
+                });
+
+                builder5.show();
+                return true;
+
+                default:
                 return super.onOptionsItemSelected(item);
         }
     }
@@ -600,6 +657,30 @@ public class MainActivity extends AppCompatActivity {
             // other 'case' lines to check for other
             // permissions this app might request
         }
+    }
+
+    private void saveData() {
+        SharedPreferences sharedPreferences = getSharedPreferences("MyPref", 0);
+        SharedPreferences.Editor editor = sharedPreferences.edit();
+        Gson gson = new Gson();
+
+        String json = gson.toJson(data);
+        editor.putString("task list", json);
+        editor.apply();
+    }
+
+    private void loadData() {
+        SharedPreferences sharedPreferences = getSharedPreferences("MyPref", 0);
+        Gson gson = new Gson();
+        String json = sharedPreferences.getString("task list", null);
+        Type type = new TypeToken<ArrayList<DataModel>>() {}.getType();
+
+
+        data = gson.fromJson(json, type);
+        if (data == null) {
+            data = new ArrayList<DataModel>();
+        }
+
     }
 
 }

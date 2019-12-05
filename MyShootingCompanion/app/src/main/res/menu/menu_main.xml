@@ -25,6 +25,14 @@
         android:title="Set time before beep"
         app:showAsAction="never"/>
     <item
+        android:id="@+id/item7"
+        android:title="Save Runs"
+        app:showAsAction="never"/>
+    <item
+        android:id="@+id/item8"
+        android:title="Load Runs"
+        app:showAsAction="never"/>
+    <item
         android:id="@+id/item5"
         android:title="Clear results"
         app:showAsAction="never"/>
